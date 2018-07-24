@@ -30,6 +30,13 @@ After cloning the repo:
 yarn install
 ```
 
+## How to debug JS ##
+
+After installing react-devtools:
+```
+react-devtools
+```
+
 
 ## How to run the project for development after setup - iOS ##
 Set up the environment according to the [documentation](https://facebook.github.io/react-native/docs/getting-started.html).

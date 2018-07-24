@@ -14,94 +14,12 @@ enum backgroundColours {
 
 interface State {
     currentTime: string;
+    alarm: {
+        brightnessActivated: boolean
+    };
     animations: {
         opacity: Value;
         backgroundColor: Value;
-    }
-}
-
-type Props = {};
-export default class App extends Component<Props, State> {
-
-    private interval: any;
-    private transitionPeriod: number = 5000; // todo, replace with 10 minutes
-
-    constructor(props: any) {
-        super(props);
-        this.state = {
-            currentTime: Moment().format('HH:mm:ss'),
-            animations: {
-                opacity: new Animated.Value(0),
-                backgroundColor: new Animated.Value(backgroundColours.RED)
-            }
-        };
-    }
-
-    componentDidMount() {
-        Animated.sequence([
-            Animated.timing(
-                this.state.animations.opacity,
-                {
-                    toValue: 1,
-                    duration: 5000, // todo, update to 30 seconds
-                    delay: 5000 // todo, determine if this is a transition period
-                }
-            ),
-            Animated.timing(
-                this.state.animations.backgroundColor,
-                {
-                    toValue: backgroundColours.YELLOW,
-                    duration: this.transitionPeriod * (Object.keys(backgroundColours).length - 1),
-                    delay: this.transitionPeriod
-                }
-            )
-        ]).start();
-        this.interval = setInterval(
-            () => {
-                this.setState({
-                    currentTime: Moment().format('HH:mm:ss')
-                });
-                // console.log(parseInt(Moment().format('ss'), 10));
-                //get the current brightness
-                // SystemSetting.getBrightness().then((brightness: any)=>{
-                //     console.log('Current brightness is ' + brightness);
-                // });
-
-//change the brightness & check permission
-                SystemSetting.setBrightnessForce(1.0).then((success: any)=>{
-                    !success && Alert.alert('Permission Deny', 'You have no permission changing settings',[
-                        {'text': 'Ok', style: 'cancel'},
-                        {'text': 'Open Setting', onPress:()=>SystemSetting.grantWriteSettingPremission()}
-                    ])
-                });
-
-// save the value of brightness and screen mode.
-                SystemSetting.saveBrightness();
-            },
-            1000);
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.interval);
-    }
-
-    render() {
-        return (
-            <View style={styles.container}>
-                <Animated.View
-                    style={{
-                        ...styles.underlay,
-                        opacity: this.state.animations.opacity,
-                        backgroundColor: this.state.animations.backgroundColor.interpolate({
-                            inputRange: [backgroundColours.RED, backgroundColours.ORANGE, backgroundColours.YELLOW],
-                            outputRange: ['rgb(231,58,46)', 'rgb(252,114,61)', 'rgb(254,226,94)']
-                        })
-                    }}></Animated.View>
-                <Text style={styles.currentTime}
-                      adjustsFontSizeToFit
-                      numberOfLines={1}>{this.state.currentTime}</Text>
-            </View>
-        );
     }
 }
 
@@ -138,3 +56,115 @@ const styles: any = StyleSheet.create({
         backgroundColor: '#e73a2e'
     }
 });
+
+export default class App extends Component<{}, State> {
+
+    private interval: any;
+    private transitionPeriod: number = 5000; // todo, replace with 10 minutes
+
+    constructor(props: any) {
+        super(props);
+        this.state = {
+            currentTime: Moment().format('HH:mm:ss'),
+            alarm: {
+                brightnessActivated: false
+            },
+            animations: {
+                opacity: new Animated.Value(0),
+                backgroundColor: new Animated.Value(backgroundColours.RED)
+            }
+        };
+    }
+
+    componentDidMount() {
+        this.interval = setInterval(
+            () => {
+                let timeToWakeUp: boolean = true; // todo, replace with timer setting
+                if (timeToWakeUp && !this.state.alarm.brightnessActivated) {
+                    // only activate brightness once
+                    this._activateScreenBrightness();
+                    // start sunrise animations
+                    Animated.sequence([
+                        Animated.timing(
+                            this.state.animations.opacity,
+                            {
+                                toValue: 1,
+                                duration: 5000, // todo, update to 30 seconds
+                                delay: 5000 // todo, determine if this is a transition period
+                            }
+                        ),
+                        Animated.timing(
+                            this.state.animations.backgroundColor,
+                            {
+                                toValue: backgroundColours.YELLOW,
+                                duration: this.transitionPeriod * (Object.keys(backgroundColours).length - 1),
+                                delay: this.transitionPeriod
+                            }
+                        )
+                    ]).start();
+                    this.setState({
+                        currentTime: Moment().format('HH:mm:ss'),
+                        alarm: {
+                            ...this.state.alarm,
+                            brightnessActivated: true
+                        }
+                    });
+                } else {
+                    this.setState({
+                        currentTime: Moment().format('HH:mm:ss'),
+                    });
+                }
+            },
+            1000);
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.interval);
+    }
+
+    render() {
+        // todo, add alarm off button
+        // todo, add brightness/light off/on button
+        // todo, add route for setting alarm time
+        return (
+            <View style={styles.container}>
+                <Animated.View
+                    style={{
+                        ...styles.underlay,
+                        opacity: this.state.animations.opacity,
+                        backgroundColor: this.state.animations.backgroundColor.interpolate({
+                            inputRange: [backgroundColours.RED, backgroundColours.ORANGE, backgroundColours.YELLOW],
+                            outputRange: ['rgb(231,58,46)', 'rgb(252,114,61)', 'rgb(254,226,94)']
+                        })
+                    }}></Animated.View>
+                <Text style={styles.currentTime}
+                      adjustsFontSizeToFit
+                      numberOfLines={1}>{this.state.currentTime}</Text>
+            </View>
+        );
+    }
+
+    private _activateScreenBrightness(): void {
+        //get the current brightness
+        SystemSetting.getBrightness().then((brightness: any)=> {
+            console.log('Current brightness is ' + brightness);
+        });
+        //change the brightness & check permission
+        // todo, animate over 30 seconds
+        SystemSetting.setBrightnessForce(1.0)
+            .then((success: boolean) => {
+                !success && Alert.alert('Permission Deny', 'You have no permission changing settings',[
+                    {'text': 'Ok', style: 'cancel'},
+                    {'text': 'Open Setting', onPress:()=>SystemSetting.grantWriteSettingPremission()}
+                ]);
+                // save the value of brightness and screen mode.
+                return SystemSetting.saveBrightness();
+            })
+            .then(() => {
+                // log new brightness
+                SystemSetting.getBrightness().then((brightness: any)=>{
+                    console.log('new brightness is ' + brightness);
+                });
+            });
+    }
+}
