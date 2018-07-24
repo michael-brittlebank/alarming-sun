@@ -37,8 +37,8 @@ const styles: any = StyleSheet.create({
         opacity: 0
     },
     currentTime: {
+        fontFamily: "Eczar",
         fontSize: 100,
-        lineHeight: 100,
         color: 'white',
         textShadowColor: 'rgba(0, 0, 0, 0.75)',
         textShadowOffset: {width: -1, height: 1},
@@ -61,6 +61,7 @@ export default class App extends Component<{}, State> {
 
     private interval: any;
     private transitionPeriod: number = 5000; // todo, replace with 10 minutes
+    private sunriseAnimation: any;
 
     constructor(props: any) {
         super(props);
@@ -84,7 +85,7 @@ export default class App extends Component<{}, State> {
                     // only activate brightness once
                     this._activateScreenBrightness();
                     // start sunrise animations
-                    Animated.sequence([
+                    this.sunriseAnimation = Animated.sequence([
                         Animated.timing(
                             this.state.animations.opacity,
                             {
