@@ -14,7 +14,6 @@ enum backgroundColours {
 
 interface State {
     currentTime: string;
-    tick: boolean;
     animations: {
         opacity: Value;
         backgroundColor: Value;
@@ -30,8 +29,7 @@ export default class App extends Component<Props, State> {
     constructor(props: any) {
         super(props);
         this.state = {
-            currentTime: '',
-            tick: false,
+            currentTime: Moment().format('HH:mm:ss'),
             animations: {
                 opacity: new Animated.Value(0),
                 backgroundColor: new Animated.Value(backgroundColours.RED)
@@ -61,17 +59,16 @@ export default class App extends Component<Props, State> {
         this.interval = setInterval(
             () => {
                 this.setState({
-                    currentTime: Moment().format('HH:mm:ss'),
-                    // tick: !this.state.tick
+                    currentTime: Moment().format('HH:mm:ss')
                 });
-                console.log(parseInt(Moment().format('ss'), 10));
+                // console.log(parseInt(Moment().format('ss'), 10));
                 //get the current brightness
-                SystemSetting.getBrightness().then((brightness: any)=>{
-                    console.log('Current brightness is ' + brightness);
-                });
+                // SystemSetting.getBrightness().then((brightness: any)=>{
+                //     console.log('Current brightness is ' + brightness);
+                // });
 
 //change the brightness & check permission
-                SystemSetting.setBrightnessForce(this.state.tick ? 1.0 : 0.0).then((success: any)=>{
+                SystemSetting.setBrightnessForce(1.0).then((success: any)=>{
                     !success && Alert.alert('Permission Deny', 'You have no permission changing settings',[
                         {'text': 'Ok', style: 'cancel'},
                         {'text': 'Open Setting', onPress:()=>SystemSetting.grantWriteSettingPremission()}
@@ -100,7 +97,9 @@ export default class App extends Component<Props, State> {
                             outputRange: ['rgb(231,58,46)', 'rgb(252,114,61)', 'rgb(254,226,94)']
                         })
                     }}></Animated.View>
-                <Text style={styles.currentTime}>{this.state.currentTime}</Text>
+                <Text style={styles.currentTime}
+                      adjustsFontSizeToFit
+                      numberOfLines={1}>{this.state.currentTime}</Text>
             </View>
         );
     }
@@ -120,13 +119,13 @@ const styles: any = StyleSheet.create({
         opacity: 0
     },
     currentTime: {
-        flex: 2,
         fontSize: 100,
-        textAlign: 'center',
+        lineHeight: 100,
         color: 'white',
         textShadowColor: 'rgba(0, 0, 0, 0.75)',
         textShadowOffset: {width: -1, height: 1},
-        textShadowRadius: 10
+        textShadowRadius: 10,
+        padding: 25
     },
     // colors
     yellow: {
