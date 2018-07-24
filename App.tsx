@@ -1,6 +1,6 @@
 import React from 'react'
 import { Component } from 'react';
-import { Alert, Animated, StyleSheet, Text, View } from 'react-native';
+import { Alert, Animated, StyleSheet, Text, TouchableNativeFeedback, View } from 'react-native';
 import Moment from 'moment';
 import SystemSetting from 'react-native-system-setting'
 import Value = Animated.Value;
@@ -45,6 +45,16 @@ const styles: any = StyleSheet.create({
         textShadowRadius: 10,
         padding: 25
     },
+    // buttons
+    buttonSleep: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        width: 200,
+        height: 100,
+        backgroundColor: 'red'
+    },
     // colors
     yellow: {
         backgroundColor: '#fee25e'
@@ -75,6 +85,7 @@ export default class App extends Component<{}, State> {
                 backgroundColor: new Animated.Value(backgroundColours.RED)
             }
         };
+        this._onPressSleep = this._onPressSleep.bind(this);
     }
 
     componentDidMount() {
@@ -124,11 +135,11 @@ export default class App extends Component<{}, State> {
     }
 
     render() {
-        // todo, add alarm off button
         // todo, add brightness/light off/on button
         // todo, add route for setting alarm time
         return (
             <View style={styles.container}>
+                {/*sunrise*/}
                 <Animated.View
                     style={{
                         ...styles.underlay,
@@ -137,10 +148,19 @@ export default class App extends Component<{}, State> {
                             inputRange: [backgroundColours.RED, backgroundColours.ORANGE, backgroundColours.YELLOW],
                             outputRange: ['rgb(231,58,46)', 'rgb(252,114,61)', 'rgb(254,226,94)']
                         })
-                    }}></Animated.View>
+                    }}/>
+                {/*clock face*/}
                 <Text style={styles.currentTime}
                       adjustsFontSizeToFit
                       numberOfLines={1}>{this.state.currentTime}</Text>
+                {/* sleep button */}
+                <TouchableNativeFeedback
+                    onPress={this._onPressSleep}
+                    background={TouchableNativeFeedback.SelectableBackground()}>
+                    <View style={styles.buttonSleep}>
+                        <Text>Button</Text>
+                    </View>
+                </TouchableNativeFeedback>
             </View>
         );
     }
@@ -167,5 +187,20 @@ export default class App extends Component<{}, State> {
                     console.log('new brightness is ' + brightness);
                 });
             });
+    }
+
+    private _onPressSleep(): void {
+        if (this.state.alarm.brightnessActivated) {
+            // stop animations
+            this.state.animations.backgroundColor.stopAnimation();
+            this.state.animations.opacity.stopAnimation();
+            // reset initial colour
+            this.setState({
+                animations: {
+                    opacity: new Animated.Value(0),
+                    backgroundColor: new Animated.Value(backgroundColours.RED)
+                }
+            })
+        }
     }
 }
