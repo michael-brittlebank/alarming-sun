@@ -8,7 +8,7 @@
 
 import React from 'react'
 import { Component } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, AppState, StyleSheet, Text, TextComponent, View, ViewComponent } from 'react-native';
 import Moment from 'moment';
 import SystemSetting from 'react-native-system-setting'
 
@@ -31,6 +31,14 @@ export default class App extends Component<Props, State> {
     }
 
     componentDidMount() {
+        AppState.addEventListener('change', (state: any) => {
+            if (state === 'active') {
+                console.log('state active');
+            }
+            if(state === 'background'){
+                console.log('background');
+            }
+        });
         this.interval = setInterval(
             () => {
                 this.setState({
@@ -56,6 +64,7 @@ export default class App extends Component<Props, State> {
             },
             1000);
     }
+
     componentWillUnmount() {
         clearInterval(this.interval);
     }
@@ -64,6 +73,9 @@ export default class App extends Component<Props, State> {
         return (
             <View style={styles.container}>
                 <Text style={styles.currentTime}>{this.state.currentTime}</Text>
+                <View style={styles.yellow}/>
+                <View style={styles.orange}/>
+                <View style={styles.red}/>
             </View>
         );
     }
@@ -72,8 +84,8 @@ export default class App extends Component<Props, State> {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        // justifyContent: 'center',
+        // alignItems: 'center',
         backgroundColor: 'black',
     },
     currentTime: {
@@ -81,5 +93,17 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         margin: 10,
         color: 'white'
+    },
+    yellow: {
+        flex: 1,
+        backgroundColor: '#fee25e'
+    },
+    orange: {
+        flex: 1,
+        backgroundColor: '#fc723d'
+    },
+    red: {
+        flex: 1,
+        backgroundColor: '#e73a2e'
     }
 });
