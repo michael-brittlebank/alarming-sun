@@ -1,6 +1,6 @@
 import React from 'react'
 import { Component } from 'react';
-import { Alert, Animated, StyleSheet, Text, TouchableNativeFeedback, View } from 'react-native';
+import { Alert, Animated, Modal, StyleSheet, Text, TouchableHighlight, TouchableNativeFeedback, View } from 'react-native';
 import Moment from 'moment';
 import SystemSetting from 'react-native-system-setting'
 import Value = Animated.Value;
@@ -15,6 +15,7 @@ enum backgroundColours {
 interface State {
     currentTime: string;
     isBrightnessOn: boolean;
+    isModalVisible: boolean;
     alarm: {
         brightnessActivated: boolean
     };
@@ -89,6 +90,7 @@ export default class App extends Component<{}, State> {
         super(props);
         this.state = {
             isBrightnessOn: true,
+            isModalVisible: false,
             currentTime: Moment().format('HH:mm:ss'),
             alarm: {
                 brightnessActivated: false
@@ -100,6 +102,7 @@ export default class App extends Component<{}, State> {
         };
         this._onPressSleep = this._onPressSleep.bind(this);
         this._onPressBrightness = this._onPressBrightness.bind(this);
+        this._onPressSetAlarm = this._onPressSetAlarm.bind(this);
     }
 
     componentDidMount() {
@@ -149,8 +152,6 @@ export default class App extends Component<{}, State> {
     }
 
     render() {
-        // todo, add brightness/light off/on button
-        // todo, add route for setting alarm time
         return (
             <View style={styles.container}>
                 {/*sunrise*/}
@@ -188,9 +189,42 @@ export default class App extends Component<{}, State> {
                         top: 0,
                         right: 0
                     }}>
-                        <Text style={styles.buttonGeneric}>&#xf011;</Text>
+                        <Text style={styles.buttonGeneric}>&#xf1f6;</Text>
                     </View>
                 </TouchableNativeFeedback>
+                {/* sleep button */}
+                <TouchableNativeFeedback
+                    onPress={this._onPressSetAlarm}
+                    background={TouchableNativeFeedback.SelectableBackground()}>
+                    <View style={{
+                        ...styles.containerButtonGeneric,
+                        bottom: 0,
+                        right: 0
+                    }}>
+                        <Text style={styles.buttonGeneric}>&#xf017;</Text>
+                    </View>
+                </TouchableNativeFeedback>
+                <Modal
+                    animationType="slide"
+                    transparent={false}
+                    visible={this.state.isModalVisible}
+                    onRequestClose={() => {
+                        alert('Modal has been closed.');
+                    }}>
+                    <View style={styles.container}>
+                        <View>
+                            <Text style={{color: 'white'}}>Hello World!</Text>
+                            <TouchableHighlight
+                                onPress={() => {
+                                    this.setState({
+                                        isModalVisible: false
+                                    });
+                                }}>
+                                <Text style={{color: 'white'}}>Close</Text>
+                            </TouchableHighlight>
+                        </View>
+                    </View>
+                </Modal>
             </View>
         );
     }
@@ -204,9 +238,9 @@ export default class App extends Component<{}, State> {
         // todo, animate over 30 seconds
         SystemSetting.setBrightnessForce(1.0)
             .then((success: boolean) => {
-                !success && Alert.alert('Permission Deny', 'You have no permission changing settings',[
-                    {'text': 'Ok', style: 'cancel'},
-                    {'text': 'Open Setting', onPress:()=>SystemSetting.grantWriteSettingPremission()}
+                !success && Alert.alert('Permission Denied', 'Please grant the app permission to change settings otherwise it will not work correctly',[
+                    {'text': 'Cancel', style: 'cancel'},
+                    {'text': 'Open Settings', onPress:()=>SystemSetting.grantWriteSettingPremission()}
                 ]);
                 // save the value of brightness and screen mode.
                 return SystemSetting.saveBrightness();
@@ -250,5 +284,11 @@ export default class App extends Component<{}, State> {
                     isBrightnessOn: !this.state.isBrightnessOn
                 })
             });
+    }
+
+    private _onPressSetAlarm(): void {
+        this.setState({
+            isModalVisible: true
+        });
     }
 }
