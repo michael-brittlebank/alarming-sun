@@ -14,6 +14,7 @@ enum backgroundColours {
 
 interface State {
     currentTime: string;
+    isBrightnessOn: boolean;
     alarm: {
         brightnessActivated: boolean
     };
@@ -23,6 +24,8 @@ interface State {
     }
 }
 
+const buttonHeightWidth: number = 75;
+const textColour: string = 'lightgrey';
 const styles: any = StyleSheet.create({
     container: {
         flex: 1,
@@ -39,21 +42,30 @@ const styles: any = StyleSheet.create({
     currentTime: {
         fontFamily: "Eczar",
         fontSize: 100,
-        color: 'white',
+        color: textColour,
         textShadowColor: 'rgba(0, 0, 0, 0.75)',
         textShadowOffset: {width: -1, height: 1},
         textShadowRadius: 10,
-        padding: 25
+        padding: 25,
+        width: 420
     },
     // buttons
-    buttonSleep: {
+    containerButtonGeneric: {
         position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        width: 200,
-        height: 100,
-        backgroundColor: 'red'
+        width: buttonHeightWidth,
+        height: buttonHeightWidth,
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    buttonGeneric: {
+        color: textColour,
+        fontFamily: "fontawesome",
+        fontSize: 30,
+        padding: 10,
+        textShadowColor: 'rgba(0, 0, 0, 0.75)',
+        textShadowOffset: {width: -1, height: 1},
+        textShadowRadius: 10,
     },
     // colors
     yellow: {
@@ -76,6 +88,7 @@ export default class App extends Component<{}, State> {
     constructor(props: any) {
         super(props);
         this.state = {
+            isBrightnessOn: true,
             currentTime: Moment().format('HH:mm:ss'),
             alarm: {
                 brightnessActivated: false
@@ -86,6 +99,7 @@ export default class App extends Component<{}, State> {
             }
         };
         this._onPressSleep = this._onPressSleep.bind(this);
+        this._onPressBrightness = this._onPressBrightness.bind(this);
     }
 
     componentDidMount() {
@@ -102,7 +116,7 @@ export default class App extends Component<{}, State> {
                             {
                                 toValue: 1,
                                 duration: 5000, // todo, update to 30 seconds
-                                delay: 5000 // todo, determine if this is a transition period
+                                delay: 5000 // todo, remove after ability to add time
                             }
                         ),
                         Animated.timing(
@@ -110,7 +124,7 @@ export default class App extends Component<{}, State> {
                             {
                                 toValue: backgroundColours.YELLOW,
                                 duration: this.transitionPeriod * (Object.keys(backgroundColours).length - 1),
-                                delay: this.transitionPeriod
+                                // delay: this.transitionPeriod
                             }
                         )
                     ]).start();
@@ -153,12 +167,28 @@ export default class App extends Component<{}, State> {
                 <Text style={styles.currentTime}
                       adjustsFontSizeToFit
                       numberOfLines={1}>{this.state.currentTime}</Text>
+                {/* brightness button */}
+                <TouchableNativeFeedback
+                    onPress={this._onPressBrightness}
+                    background={TouchableNativeFeedback.SelectableBackground()}>
+                    <View style={{
+                        ...styles.containerButtonGeneric,
+                        top: 0,
+                        left: 0
+                    }}>
+                        <Text style={styles.buttonGeneric}>&#xf0eb;</Text>
+                    </View>
+                </TouchableNativeFeedback>
                 {/* sleep button */}
                 <TouchableNativeFeedback
                     onPress={this._onPressSleep}
                     background={TouchableNativeFeedback.SelectableBackground()}>
-                    <View style={styles.buttonSleep}>
-                        <Text>Button</Text>
+                    <View style={{
+                        ...styles.containerButtonGeneric,
+                        top: 0,
+                        right: 0
+                    }}>
+                        <Text style={styles.buttonGeneric}>&#xf011;</Text>
                     </View>
                 </TouchableNativeFeedback>
             </View>
@@ -202,5 +232,23 @@ export default class App extends Component<{}, State> {
                 }
             })
         }
+    }
+
+    private _onPressBrightness(): void {
+        SystemSetting.setBrightnessForce(this.state.isBrightnessOn ? 1.0 : 0.0)
+            .then((success: boolean) => {
+                !success && Alert.alert('Permission Deny', 'You have no permission changing settings',[
+                    {'text': 'Ok', style: 'cancel'},
+                    {'text': 'Open Setting', onPress:()=>SystemSetting.grantWriteSettingPremission()}
+                ]);
+                console.log('brightness on?', this.state.isBrightnessOn);
+                // save the value of brightness and screen mode.
+                return SystemSetting.saveBrightness();
+            })
+            .then(() => {
+                this.setState({
+                    isBrightnessOn: !this.state.isBrightnessOn
+                })
+            });
     }
 }

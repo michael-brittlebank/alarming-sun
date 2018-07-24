@@ -54,6 +54,7 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>Eczar.ttf</string>
+		<string>fontawesome.ttf</string>
 	</array>
 </dict>
 </plist>

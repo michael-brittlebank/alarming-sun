@@ -39,6 +39,7 @@
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
 		463E91077F9740189EF7595C /* libRCTSystemSetting.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 68849DC55C1744C6BA59D0EA /* libRCTSystemSetting.a */; };
 		F49D489E3B0B491C9374214B /* Eczar.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 773F862EE720422EBAE572EF /* Eczar.ttf */; };
+		09610DEEC937463FA8F460E5 /* fontawesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 71759C76CB364E21BE434699 /* fontawesome.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -347,6 +348,7 @@
 		0A980D32525940A58937B9A1 /* RCTSystemSetting.xcodeproj */ = {isa = PBXFileReference; name = "RCTSystemSetting.xcodeproj"; path = "../node_modules/react-native-system-setting/ios/RCTSystemSetting.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		68849DC55C1744C6BA59D0EA /* libRCTSystemSetting.a */ = {isa = PBXFileReference; name = "libRCTSystemSetting.a"; path = "libRCTSystemSetting.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 		773F862EE720422EBAE572EF /* Eczar.ttf */ = {isa = PBXFileReference; name = "Eczar.ttf"; path = "../assets/fonts/Eczar.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		71759C76CB364E21BE434699 /* fontawesome.ttf */ = {isa = PBXFileReference; name = "fontawesome.ttf"; path = "../assets/fonts/fontawesome.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -615,6 +617,7 @@
 			isa = "PBXGroup";
 			children = (
 				773F862EE720422EBAE572EF /* Eczar.ttf */,
+				71759C76CB364E21BE434699 /* fontawesome.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1067,6 +1070,7 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 				F49D489E3B0B491C9374214B /* Eczar.ttf in Resources */,
+				09610DEEC937463FA8F460E5 /* fontawesome.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
